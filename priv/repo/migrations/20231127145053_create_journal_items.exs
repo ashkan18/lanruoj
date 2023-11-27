@@ -2,7 +2,8 @@ defmodule Lanruoj.Repo.Migrations.CreateJournalItems do
   use Ecto.Migration
 
   def change do
-    create table(:journal_items) do
+    create table(:journal_items, primary_key: false) do
+      add :id, :binary_id, primary_key: true
       add :journal_description, :text
       add :tags, {:array, :string}
       add :user_id, references(:users, on_delete: :nothing)
