@@ -16,6 +16,6 @@ defmodule Lanruoj.Journals.JournalItem do
   def changeset(journal_item, attrs) do
     journal_item
     |> cast(attrs, [:journal_description, :tags])
-    |> validate_required([:journal_description, :tags])
+    |> validate_required([:journal_description])
   end
 end
