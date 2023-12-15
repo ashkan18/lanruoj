@@ -4,13 +4,12 @@ defmodule Lanruoj.Journals do
   """
 
   import Ecto.Query, warn: false
+  alias Postgrex.Extensions.Array
   alias Lanruoj.Repo
 
   alias Lanruoj.Journals.{JournalItem}
 
   ## Database getters
-
-
 
   ## User registration
 
@@ -43,5 +42,14 @@ defmodule Lanruoj.Journals do
   """
   def add_journal_changeset(%JournalItem{} = item, attrs \\ %{}) do
     JournalItem.changeset(item, attrs)
+  end
+
+  @spec get_user_journals_by_date(String.t(), DateTime.t()) :: list(JournalItem)
+  def get_user_journals_by_date(user_id, %DateTime{} = dateTime) do
+    from(j in JournalItem,
+      where: j.user_id == ^user_id,
+      where: fragment("?::date", j.inserted_at) == ^DateTime.to_date(dateTime)
+    )
+    |> Repo.all()
   end
 end

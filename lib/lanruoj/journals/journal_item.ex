@@ -7,7 +7,7 @@ defmodule Lanruoj.Journals.JournalItem do
   schema "journal_items" do
     field :journal_description, :string
     field :tags, {:array, :string}
-    field :user_id, :binary_id
+    belongs_to :user, Lanruoj.Accounts.User
 
     timestamps(type: :utc_datetime)
   end
@@ -16,6 +16,8 @@ defmodule Lanruoj.Journals.JournalItem do
   def changeset(journal_item, attrs) do
     journal_item
     |> cast(attrs, [:journal_description, :tags])
-    |> validate_required([:journal_description])
+    |> cast_assoc(:user)
+    |> foreign_key_constraint(:user_id)
+    |> validate_required([:journal_description, :user_id])
   end
 end
