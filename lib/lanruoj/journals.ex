@@ -4,7 +4,6 @@ defmodule Lanruoj.Journals do
   """
 
   import Ecto.Query, warn: false
-  alias Postgrex.Extensions.Array
   alias Lanruoj.Repo
 
   alias Lanruoj.Journals.{JournalItem}
@@ -26,8 +25,10 @@ defmodule Lanruoj.Journals do
 
   """
   def add_journal(attrs) do
+    IO.inspect(attrs, label: :stuff)
     %JournalItem{}
     |> JournalItem.changeset(attrs)
+    |> IO.inspect(label: :changeset)
     |> Repo.insert()
   end
 

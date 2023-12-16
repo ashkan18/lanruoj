@@ -5,7 +5,7 @@ defmodule Lanruoj.Journals.JournalItem do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "journal_items" do
-    field :journal_description, :string
+    field :description, :string
     field :tags, {:array, :string}
     belongs_to :user, Lanruoj.Accounts.User
 
@@ -15,9 +15,9 @@ defmodule Lanruoj.Journals.JournalItem do
   @doc false
   def changeset(journal_item, attrs) do
     journal_item
-    |> cast(attrs, [:journal_description, :tags])
+    |> cast(attrs, [:description, :tags, :user_id])
     |> cast_assoc(:user)
     |> foreign_key_constraint(:user_id)
-    |> validate_required([:journal_description, :user_id])
+    |> validate_required([:description, :user_id])
   end
 end
