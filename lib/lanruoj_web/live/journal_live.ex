@@ -1,4 +1,5 @@
 defmodule LanruojWeb.JournalLive do
+  alias Lanruoj.Journals.Commands
   alias Lanruoj.Journals.JournalItem
   alias Lanruoj.Journals
   alias Phoenix.LiveView.AsyncResult
@@ -24,8 +25,14 @@ defmodule LanruojWeb.JournalLive do
             field={@journal_form[:description]}
             type="text"
             label="Description"
+            list="commands"
             required
           />
+          <datalist id="commands">
+            <%= for command <- Map.keys(@commands) do %>
+              <option value={ Map.fetch!(@commands, command) }> <%= command %> </option>
+            <% end %>
+          </datalist>
           <:actions>
             <.button phx-disable-with="Changing...">Add Item</.button>
           </:actions>
@@ -33,7 +40,9 @@ defmodule LanruojWeb.JournalLive do
         <.async_result :let={today_journals} assign={@today_journals}>
           <:loading>Loading journals...</:loading>
           <:failed :let={_reason}>there was an error loading journals</:failed>
-          <%= Enum.count(today_journals) %>
+          <%= for journal <- today_journals do %>
+            <div><%= journal.description %></div>
+          <% end %>
         </.async_result>
       </div>
     </div>
@@ -46,24 +55,29 @@ defmodule LanruojWeb.JournalLive do
     socket =
       socket
       |> assign(:current_email, user.email)
+      |> assign(:commands, [])
       |> assign(:journal_form, to_form(journal_changeset))
       |> assign(:today_journals, AsyncResult.loading())
+      |> assign(:commands, Commands.commands())
       |> start_async(:fetch_journal_items, fn -> Journals.get_user_journals_by_date(user.id, DateTime.utc_now()) end)
 
     {:ok, socket}
   end
 
   def handle_event("check_text", params, socket) do
-    IO.inspect(params)
-    user = socket.assigns.current_user
+    %{"journal_item" => %{"description" => description}} = params
+    # user = socket.assigns.current_user
+    case description do
+      "/" ->
+        {:noreply, socket}
 
-    {:noreply, socket}
+      _ -> {:noreply, socket}
+    end
   end
 
-  def handle_event("add_journal", params, socket) do
+  def handle_event("add_journal", %{"journal_item" => journal_item} , socket) do
     user = socket.assigns.current_user
 
-    %{"journal_item" => journal_item} = params
     case Journals.add_journal(Map.merge(journal_item, %{"user_id" => user.id})) do
       {:ok, _item } ->
         {:noreply, start_async(socket, :fetch_journal_items, fn -> Journals.get_user_journals_by_date(user.id, DateTime.utc_now()) end)}
