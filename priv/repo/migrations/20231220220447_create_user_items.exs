@@ -5,7 +5,7 @@ defmodule Lanruoj.Repo.Migrations.CreateUserItems do
     create table(:user_items) do
       add :item, :string
       add :type, :string
-      add :user_id, references(:users, on_delete: :nothing)
+      add :user_id, references(:users, on_delete: :nothing, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime)
     end

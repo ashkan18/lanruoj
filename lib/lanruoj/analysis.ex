@@ -107,10 +107,6 @@ defmodule Lanruoj.Analysis do
     UserItems.changeset(user_items, attrs)
   end
 
-  @spec analyze_journal(%Lanruoj.Journals.JournalItem{
-          :description => binary(),
-          optional(any()) => any()
-        }) :: list()
   def analyze_journal(%JournalItem{} = journal_item) do
      @people_regex
       |> Regex.scan(journal_item.description)
